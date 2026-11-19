@@ -1,0 +1,14 @@
+# 统一文本换行：本项目的 Lua / conf / Makefile 需在 WSL/Linux 下直接执行，
+# 必须保持 LF。Windows 下 checkout 也不做 CRLF 转换。
+* text=auto eol=lf
+
+# 明确按文本处理（避免扩展名识别歧义）
+*.lua    text eol=lf
+*.md     text eol=lf
+*.conf   text eol=lf
+*.c      text eol=lf
+*.h      text eol=lf
+*.proto  text eol=lf
+*.yml    text eol=lf
+*.sh     text eol=lf
+Makefile text eol=lf

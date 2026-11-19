@@ -1,0 +1,40 @@
+# ===== 日志与运行产物 =====
+*.log
+*.pid
+**/log/
+ch4.log
+ch5.log
+ch6.log
+ch7.log
+ch8.log
+ch9.log
+ch10.log
+ch11.log
+ch12.log
+
+# ===== 编译产物（由各章 make 重新生成）=====
+**/luaclib/*.so
+**/*.o
+**/*.a
+
+# ===== 开发残留（整理仓库时建议删除）=====
+Makefile.old
+**/old/
+.screenshots/
+
+# ===== Skynet 依赖 =====
+# skynet/ 以 git submodule 引入（见 .gitmodules），主仓库只记录 gitlink，
+# 不跟踪其源码；克隆时用 git clone --recursive 拉取。
+# （若将来改回普通 clone，再取消下一行注释）
+# /skynet/
+
+# ===== 本地 Agent 数据（非交付内容）=====
+.workbuddy/
+
+# ===== 通用 =====
+.DS_Store
+*.swp
+*.swo
+node_modules/
+.idea/
+.vscode/

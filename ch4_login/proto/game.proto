@@ -1,0 +1,66 @@
+# proto/game.proto
+# sproto 协议定义：登录 + 基础业务消息
+# 注释必须用 #（sprotoparser 不识别 --）
+#
+# 语法（skynet sprotoparser）：
+#   .类型名 { 字段名 tag : 类型 }      —— 类型声明（tag 必填）
+#   协议名 tag { request 类型 / response 类型 }
+#
+# 消息流向：
+#   CLIENT ──login──→ GATE ──auth──→ LOGIN ──login──→ CENTER
+#   CENTER ──token──→ LOGIN ──agent──→ GATE ──login_resp──→ CLIENT
+#
+# 业务包体格式（Gate 之上）：
+#   上行：1 字节 cmd + sproto payload
+#   下行：1 字节 cmd + sproto payload
+#   cmd = 1 → Ping / Pong；cmd = 2 → echo_req / echo_resp
+
+.login_req {
+    uid 0 : string
+    password 1 : string
+    token 2 : string
+}
+
+.login_resp {
+    code 0 : integer
+    uid 1 : integer
+    token 2 : string
+    reason 3 : string
+}
+
+.ok {
+    uid 0 : integer
+    token 1 : string
+}
+
+.err {
+    code 0 : integer
+    reason 1 : string
+}
+
+.Ping {
+    timestamp 0 : integer
+}
+
+.Pong {
+    timestamp 0 : integer
+    latency 1 : integer
+}
+
+.echo_req {
+    content 0 : string
+}
+
+.echo_resp {
+    content 0 : string
+}
+
+login 1 {
+    request login_req
+    response login_resp
+}
+
+ping 2 {
+    request Ping
+    response Pong
+}
