@@ -17,16 +17,20 @@ ch12.log
 **/*.o
 **/*.a
 
-# ===== 文档一律不入库（仅保留源码与配图；md 留在本地）=====
+# ===== 文档一律不入库（仅保留源码；md 留在本地）=====
 *.md
 
-# ===== 待发布工程（ch8 及以后，本地保留，暂不入库）=====
-/ch8_components/
+# ===== 未发布的 ch9 及以后工程（本地保留，暂不入库）=====
 /ch9_http/
 /ch10_distributed/
 /ch11_jump/
 /ch12_disconnect/
 /ch13_palace/
+
+# ===== 客户端与配图（本地保留，暂不入库）=====
+/unity_client/
+/unity_client_blog/
+/csdn_cover/
 
 # ===== 开发残留（整理仓库时建议删除）=====
 Makefile.old

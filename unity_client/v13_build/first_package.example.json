@@ -1,6 +1,0 @@
-{
-  "_comment": "首包清单模板。数值必须由构建产物填入（Build 后统计实际文件大小），不要手写估算值。check_minigame.py 会按 main 求和并与限额比较。",
-  "_how_to_fill": "构建 WebGL 小游戏包后，用 du/find 统计 dist/ 下文件大小填进来；main 是首包（启动即加载），sub 是分包。",
-  "main": [],
-  "sub": []
-}
