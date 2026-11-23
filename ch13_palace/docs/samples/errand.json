@@ -1,0 +1,70 @@
+{
+  "batch": "errand",
+  "source": "authored demo content (U6_M3_DEVLOG §2.4)",
+  "notes": "办差派遣即完成；领取发 gold + itemId/itemNum，itemId 为 gold/silver 类时走货币字段；重复领防护 claimed；数值来自 errand 表。",
+  "cases": [
+    {
+      "name": "errand_list_three",
+      "derivation": "errand 表 3 档；无 claimed → 三行 claimed=false",
+      "seed": { "gold": 0, "bag": {}, "activity": {} },
+      "op": "u.errandList",
+      "params": [],
+      "expect": {
+        "err": 200,
+        "result": { "ok": true, "rows": [
+          { "id": 1, "gold": 50, "itemId": 1001, "itemNum": 1, "claimed": false },
+          { "id": 2, "gold": 120, "itemId": 3001, "itemNum": 2, "claimed": false },
+          { "id": 3, "gold": 300, "itemId": 9001, "itemNum": 1, "claimed": false }
+        ] }
+      }
+    },
+    {
+      "name": "errand_claim_id1",
+      "derivation": "领 id1 → gold+50, item 1001x1 走 bag；bag.1001=1, gold=50。claimed 标记用下面的 duplicate 用例反向验证（数字键 map 在回放输出里会被 JSON 编成数组，按点路径断言不稳）",
+      "seed": { "gold": 0, "bag": {}, "activity": {} },
+      "op": "u.errandClaim",
+      "params": [1],
+      "expect": {
+        "err": 200,
+        "result": { "ok": true, "errandId": 1, "gold": 50, "itemId": 1001, "itemNum": 1 },
+        "state": { "gold": 50, "bag.1001": 1 }
+      }
+    },
+    {
+      "name": "errand_claim_id3_gold_kind",
+      "derivation": "领 id3 → gold+300(固定) + item 9001(gold kind) value*1=1000 → gold=0+300+1000=1300",
+      "seed": { "gold": 0, "bag": {}, "activity": {} },
+      "op": "u.errandClaim",
+      "params": [3],
+      "expect": {
+        "err": 200,
+        "result": { "ok": true, "errandId": 3, "gold": 300, "goldGain": 1000 },
+        "state": { "gold": 1300, "activity.errand.claimed.3": true }
+      }
+    },
+    {
+      "name": "errand_duplicate_claim",
+      "derivation": "已领 id1 → already_claimed，无状态变更",
+      "seed": { "gold": 50, "bag": { "1001": 1 }, "activity": { "errand": { "claimed": { "1": true } } } },
+      "op": "u.errandClaim",
+      "params": [1],
+      "expect": {
+        "err": -200,
+        "result": { "ok": false, "reason": "already_claimed" },
+        "state": { "gold": 50, "bag.1001": 1 }
+      }
+    },
+    {
+      "name": "errand_unknown_id",
+      "derivation": "errandId=999 不在表 → errand_not_found",
+      "seed": { "gold": 0, "bag": {}, "activity": {} },
+      "op": "u.errandClaim",
+      "params": [999],
+      "expect": {
+        "err": -200,
+        "result": { "ok": false, "reason": "errand_not_found" },
+        "state": { "gold": 0 }
+      }
+    }
+  ]
+}

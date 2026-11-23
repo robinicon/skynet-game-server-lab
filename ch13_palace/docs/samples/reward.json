@@ -1,0 +1,101 @@
+{
+  "batch": "reward",
+  "source": "U4 签到/在线奖励；sign/online 表来自 conf/gamedata.xlsx。",
+  "notes": "签到日由参数声明并校验连续性；在线时长由 activity.reward.onlineMin 播种。",
+  "cases": [
+    {
+      "name": "sign_day1_gold",
+      "derivation": "day1 奖励=金锭9001(value1000)x1 → gold+1000，signDay=1",
+      "seed": { "gold": 0, "bag": {}, "activity": { "reward": { "signDay": 0 } } },
+      "op": "u.rewardSign",
+      "params": [1],
+      "expect": {
+        "err": 200,
+        "result": { "ok": true, "day": 1, "field": "gold", "gain": 1000 },
+        "state": { "gold": 1000, "activity.reward.signDay": 1 }
+      }
+    },
+    {
+      "name": "sign_day2_item",
+      "derivation": "day2 奖励=小还丹1001 x2 → 背包+2，signDay 0→2(seed signDay=1)",
+      "seed": { "gold": 0, "bag": {}, "activity": { "reward": { "signDay": 1 } } },
+      "op": "u.rewardSign",
+      "params": [2],
+      "expect": {
+        "err": 200,
+        "result": { "ok": true, "day": 2, "field": "bag", "gain": 2, "itemId": 1001 },
+        "state": { "bag.1001": 2, "activity.reward.signDay": 2 }
+      }
+    },
+    {
+      "name": "sign_duplicate",
+      "derivation": "signDay=1 再签 day1 → already_signed，无发奖",
+      "seed": { "gold": 0, "activity": { "reward": { "signDay": 1 } } },
+      "op": "u.rewardSign",
+      "params": [1],
+      "expect": {
+        "err": -200,
+        "result": { "ok": false, "reason": "already_signed" },
+        "state": { "gold": 0, "activity.reward.signDay": 1 }
+      }
+    },
+    {
+      "name": "sign_skip_day",
+      "derivation": "signDay=1 跳到 day4 → sign_day_mismatch(expected=2)",
+      "seed": { "gold": 0, "activity": { "reward": { "signDay": 1 } } },
+      "op": "u.rewardSign",
+      "params": [4],
+      "expect": {
+        "err": -200,
+        "result": { "ok": false, "reason": "sign_day_mismatch", "expected": 2 }
+      }
+    },
+    {
+      "name": "sign_day7_wrap",
+      "derivation": "signDay=7 后下一天为 1（7%7+1）；seed signDay=6 签 day7 → 循环边界正确",
+      "seed": { "gold": 0, "bag": {}, "activity": { "reward": { "signDay": 6 } } },
+      "op": "u.rewardSign",
+      "params": [7],
+      "expect": {
+        "err": 200,
+        "result": { "ok": true, "day": 7 },
+        "state": { "activity.reward.signDay": 7 }
+      }
+    },
+    {
+      "name": "online_claim_30min",
+      "derivation": "onlineMin=60 领30分钟档=小还丹1001 x1 → 背包+1，标记 claimed[30]",
+      "seed": { "gold": 0, "bag": {}, "activity": { "reward": { "onlineMin": 60, "onlineClaimed": {} } } },
+      "op": "u.rewardOnline",
+      "params": [30],
+      "expect": {
+        "err": 200,
+        "result": { "ok": true, "minutes": 30, "field": "bag", "itemId": 1001, "gain": 1 },
+        "state": { "bag.1001": 1, "activity.reward.onlineClaimed.30": true }
+      }
+    },
+    {
+      "name": "online_duplicate_claim",
+      "derivation": "claimed[30]=true 再领 → already_claimed",
+      "seed": { "gold": 0, "bag": {}, "activity": { "reward": { "onlineMin": 60, "onlineClaimed": { "30": true } } } },
+      "op": "u.rewardOnline",
+      "params": [30],
+      "expect": {
+        "err": -200,
+        "result": { "ok": false, "reason": "already_claimed" },
+        "state": { "bag.1001": null }
+      }
+    },
+    {
+      "name": "online_time_not_enough",
+      "derivation": "onlineMin=50 < 60 档 → online_time_not_enough",
+      "seed": { "gold": 0, "activity": { "reward": { "onlineMin": 50, "onlineClaimed": {} } } },
+      "op": "u.rewardOnline",
+      "params": [60],
+      "expect": {
+        "err": -200,
+        "result": { "ok": false, "reason": "online_time_not_enough", "onlineMin": 50 }
+      }
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "batch": "fight",
+  "source": "U4 战斗结算（结算版）；power 公式与 seed 见 U4_DEVLOG §3.3。",
+  "notes": "确定性：seed=stageId*1000+power，无随机。胜负 power>=needPower。发奖复用 stage 规则。",
+  "cases": [
+    {
+      "name": "fight_start_deterministic",
+      "derivation": "英雄2003(quality4) lv20 → power=4*10+20*5=140；stage1 seed=1000+140=1140，needPower=0，canWin=true",
+      "seed": { "level": 20, "heroes": { "h1": { "tpl": 2003, "lv": 20, "advance": 0, "limit": 0 } } },
+      "op": "u.fightStart",
+      "params": [1],
+      "expect": {
+        "err": 200,
+        "result": { "ok": true, "stageId": 1, "seed": 1140, "power": 140, "needPower": 0, "canWin": true }
+      }
+    },
+    {
+      "name": "fight_settle_win",
+      "derivation": "power140>=stage1 needPower0 → win；发 stage1 奖励(exp100/gold50/drop1001x1)，clearMax 0→1，战报 win=true",
+      "seed": { "level": 20, "gold": 0, "bag": {},
+                "heroes": { "h1": { "tpl": 2003, "lv": 20, "advance": 0, "limit": 0 } },
+                "activity": { "stage": { "clearMax": 0, "exp": 0 } } },
+      "op": "u.fightSettle",
+      "params": [1],
+      "expect": {
+        "err": 200,
+        "result": { "ok": true, "win": true, "stageId": 1, "seed": 1140, "power": 140, "gold": 50, "exp": 100 },
+        "state": { "activity.stage.clearMax": 1, "activity.fight.last.win": true,
+                   "activity.fight.last.seed": 1140, "gold": 50, "bag.1001": 1 }
+      }
+    },
+    {
+      "name": "fight_settle_lose_no_reward",
+      "derivation": "无英雄 power=0 < stage3 needPower=20 → win=false；不发奖，只写战报 win=false",
+      "seed": { "level": 1, "gold": 0, "bag": {}, "heroes": {},
+                "activity": { "stage": { "clearMax": 0, "exp": 0 } } },
+      "op": "u.fightSettle",
+      "params": [3],
+      "expect": {
+        "err": 200,
+        "result": { "ok": true, "win": false, "stageId": 3, "power": 0, "needPower": 20 },
+        "state": { "activity.fight.last.win": false, "gold": 0, "activity.stage.clearMax": 0 }
+      }
+    },
+    {
+      "name": "fight_replay_old_stage_no_rollback",
+      "derivation": "clearMax=8 时打旧关 stage3 胜：仍发 stage3 奖励(gold=40+10*3=70)，但 clearMax 不回退（保持8）",
+      "seed": { "level": 20, "gold": 0, "bag": {},
+                "heroes": { "h1": { "tpl": 2003, "lv": 20, "advance": 0, "limit": 0 } },
+                "activity": { "stage": { "clearMax": 8, "exp": 1000 } } },
+      "op": "u.fightSettle",
+      "params": [3],
+      "expect": {
+        "err": 200,
+        "result": { "ok": true, "win": true, "gold": 70 },
+        "state": { "activity.stage.clearMax": 8, "gold": 70 }
+      }
+    }
+  ]
+}

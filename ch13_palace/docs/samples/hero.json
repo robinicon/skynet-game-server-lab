@@ -1,0 +1,193 @@
+{
+  "batch": "hero",
+  "source": [
+    "palace-game/src/main/java/com/paofu/palace/gas/service/user/HeroService.java:865 updateHeroLv",
+    "palace-game/src/main/java/com/paofu/palace/gas/service/user/HeroService.java:1311 heroAdvanceLv",
+    "palace-game/src/main/java/com/paofu/palace/gas/service/user/HeroService.java:1384 heroLimitLv",
+    "palace-common/src/main/java/com/paofu/palace/common/utils/DataUtils.java:2075 getHeroUpLvNeedExp"
+  ],
+  "notes": [
+    "数值来自 conf/gamedata.xlsx：hero_exp[lv]=100+(lv-1)*50（lv1=100 … lv5=300 … lv9=500）",
+    "surmount(2001): adv0 lvLimit10/官印x5, adv1 20/x10, adv2 30/x20, adv3 40/x40",
+    "week(2001): limit0 需adv2/爵位令x2, limit1 需adv3/x4, limit2 需adv4/x8, limit3 需adv5/x16",
+    "expect 只描述必须成立的部分：result 做子集比较，state 用点路径指名字段"
+  ],
+  "cases": [
+    {
+      "name": "lv_up_single_step",
+      "derivation": "lv1->2 需 100 经验，小还丹 100/颗 → 消耗 1 颗，经验不溢出",
+      "seed": {
+        "level": 30,
+        "heroes": { "h1": { "tpl": 2001, "lv": 1, "exp": 0, "advance": 0, "limit": 0 } },
+        "bag": { "1001": 10 }
+      },
+      "op": "u.heroUpdateLvAuto",
+      "params": ["h1", false],
+      "expect": {
+        "err": 200,
+        "result": { "ok": true, "lv": 2, "exp": 0, "toLv": 2, "gainedExp": 100, "cost": { "1001": 1 } },
+        "state": { "heroes.h1.lv": 2, "heroes.h1.exp": 0, "bag.1001": 9 }
+      }
+    },
+    {
+      "name": "lv_up_auto_capped_by_advance",
+      "derivation": "adv0 的 lvLimit=10；lv2->10 需 150+200+250+300+350+400+450+500=2600；大还丹 2000/颗，2 颗得 4000，溢出 1400 留身上",
+      "seed": {
+        "level": 30,
+        "heroes": { "h1": { "tpl": 2001, "lv": 2, "exp": 0, "advance": 0, "limit": 0 } },
+        "bag": { "1003": 2 }
+      },
+      "op": "u.heroUpdateLvAuto",
+      "params": ["h1", true],
+      "expect": {
+        "err": 200,
+        "result": { "lv": 10, "exp": 1400, "toLv": 10, "gainedExp": 4000, "cost": { "1003": 2 } },
+        "state": { "heroes.h1.lv": 10, "heroes.h1.exp": 1400, "bag.1003": null }
+      }
+    },
+    {
+      "name": "lv_up_capped_by_avatar_level",
+      "derivation": "角色等级 5 时 auto 只能升到 5；lv2->5 需 150+200+250=600，1 颗大还丹给 2000，溢出 1400",
+      "seed": {
+        "level": 5,
+        "heroes": { "h1": { "tpl": 2001, "lv": 2, "exp": 0, "advance": 0, "limit": 0 } },
+        "bag": { "1003": 1 }
+      },
+      "op": "u.heroUpdateLvAuto",
+      "params": ["h1", true],
+      "expect": {
+        "err": 200,
+        "result": { "lv": 5, "exp": 1400, "toLv": 5, "gainedExp": 2000 },
+        "state": { "heroes.h1.lv": 5 }
+      }
+    },
+    {
+      "name": "lv_up_single_step_not_auto",
+      "derivation": "非自动只升一级：lv5->6 需 300，大还丹 1 颗给 2000，溢出 1700",
+      "seed": {
+        "level": 30,
+        "heroes": { "h1": { "tpl": 2001, "lv": 5, "exp": 0, "advance": 0, "limit": 0 } },
+        "bag": { "1003": 3 }
+      },
+      "op": "u.heroUpdateLvAuto",
+      "params": ["h1", false],
+      "expect": {
+        "err": 200,
+        "result": { "lv": 6, "exp": 1700, "toLv": 6, "gainedExp": 2000, "cost": { "1003": 1 } },
+        "state": { "heroes.h1.lv": 6, "bag.1003": 2 }
+      }
+    },
+    {
+      "name": "lv_up_rejected_without_elixir",
+      "derivation": "背包为空时 getHeroElixirCost 返回 0，原实现直接 result(false)",
+      "seed": {
+        "level": 30,
+        "heroes": { "h1": { "tpl": 2001, "lv": 1, "exp": 0, "advance": 0, "limit": 0 } },
+        "bag": {}
+      },
+      "op": "u.heroUpdateLvAuto",
+      "params": ["h1", false],
+      "expect": {
+        "err": -200,
+        "result": { "ok": false, "reason": "elixir_not_enough" },
+        "state": { "heroes.h1.lv": 1 }
+      }
+    },
+    {
+      "name": "advance_ok",
+      "derivation": "adv0 要求 lv>=10，消耗官印 x5，advance 变 1，lvLimit 提到 20",
+      "seed": {
+        "level": 30,
+        "heroes": { "h1": { "tpl": 2001, "lv": 10, "exp": 0, "advance": 0, "limit": 0 } },
+        "bag": { "3001": 5 }
+      },
+      "op": "u.heroUpdateAdvanceLv",
+      "params": ["h1"],
+      "expect": {
+        "err": 200,
+        "result": { "ok": true, "advance": 1, "nextLvLimit": 20, "cost": { "3001": 5 } },
+        "state": { "heroes.h1.advance": 1, "heroes.h1.lv": 10, "bag.3001": null }
+      }
+    },
+    {
+      "name": "advance_blocked_by_level",
+      "derivation": "lv9 < adv0 的 lvLimit 10，原实现 HERO_ADVANCE_LV_LIMIT 分支",
+      "seed": {
+        "level": 30,
+        "heroes": { "h1": { "tpl": 2001, "lv": 9, "exp": 0, "advance": 0, "limit": 0 } },
+        "bag": { "3001": 5 }
+      },
+      "op": "u.heroUpdateAdvanceLv",
+      "params": ["h1"],
+      "expect": {
+        "err": -200,
+        "result": { "ok": false, "reason": "level_not_enough" },
+        "state": { "heroes.h1.advance": 0, "bag.3001": 5 }
+      }
+    },
+    {
+      "name": "advance_blocked_without_item",
+      "derivation": "官印不足时 checkCanDeductItem 失败",
+      "seed": {
+        "level": 30,
+        "heroes": { "h1": { "tpl": 2001, "lv": 10, "exp": 0, "advance": 0, "limit": 0 } },
+        "bag": { "3001": 4 }
+      },
+      "op": "u.heroUpdateAdvanceLv",
+      "params": ["h1"],
+      "expect": {
+        "err": -200,
+        "result": { "ok": false, "reason": "item_not_enough" },
+        "state": { "heroes.h1.advance": 0, "bag.3001": 4 }
+      }
+    },
+    {
+      "name": "limit_ok",
+      "derivation": "limit0 要求 adv>=2，消耗爵位令 x2 → limit 变 1",
+      "seed": {
+        "level": 30,
+        "heroes": { "h1": { "tpl": 2001, "lv": 20, "exp": 0, "advance": 2, "limit": 0 } },
+        "bag": { "3002": 2 }
+      },
+      "op": "u.heroUpdateLimitLv",
+      "params": ["h1"],
+      "expect": {
+        "err": 200,
+        "result": { "ok": true, "limit": 1, "cost": { "3002": 2 } },
+        "state": { "heroes.h1.limit": 1, "bag.3002": null }
+      }
+    },
+    {
+      "name": "limit_blocked_by_advance",
+      "derivation": "limit0 要求 adv>=2，当前 adv1 不满足",
+      "seed": {
+        "level": 30,
+        "heroes": { "h1": { "tpl": 2001, "lv": 20, "exp": 0, "advance": 1, "limit": 0 } },
+        "bag": { "3002": 2 }
+      },
+      "op": "u.heroUpdateLimitLv",
+      "params": ["h1"],
+      "expect": {
+        "err": -200,
+        "result": { "ok": false, "reason": "advance_not_enough" },
+        "state": { "heroes.h1.limit": 0, "bag.3002": 2 }
+      }
+    },
+    {
+      "name": "limit_at_config_max",
+      "derivation": "week 表只有 0..3，limit=3 时 getWeekData(lv+1) 为空 → 上限分支",
+      "seed": {
+        "level": 30,
+        "heroes": { "h1": { "tpl": 2001, "lv": 20, "exp": 0, "advance": 5, "limit": 3 } },
+        "bag": { "3002": 16 }
+      },
+      "op": "u.heroUpdateLimitLv",
+      "params": ["h1"],
+      "expect": {
+        "err": -200,
+        "result": { "ok": false, "reason": "limit_max" },
+        "state": { "heroes.h1.limit": 3, "bag.3002": 16 }
+      }
+    }
+  ]
+}

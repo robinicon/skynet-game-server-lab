@@ -1,0 +1,377 @@
+{
+  "version": 1,
+  "note": "单一事实源：字段 fid 永不复用、类型只扩不改；action aid 与老 op 一一对应",
+  "fields": [
+    {
+      "fid": 1,
+      "name": "uid",
+      "type": "int",
+      "partition": "base",
+      "persist": "index",
+      "replicate": "snapshot"
+    },
+    {
+      "fid": 2,
+      "name": "account",
+      "type": "string",
+      "partition": "base",
+      "persist": "index",
+      "replicate": "snapshot"
+    },
+    {
+      "fid": 3,
+      "name": "level",
+      "type": "int",
+      "partition": "base",
+      "persist": "index",
+      "replicate": "delta"
+    },
+    {
+      "fid": 4,
+      "name": "gold",
+      "type": "int",
+      "partition": "base",
+      "persist": "index",
+      "replicate": "delta"
+    },
+    {
+      "fid": 5,
+      "name": "vip",
+      "type": "int",
+      "partition": "base",
+      "persist": "lazy",
+      "replicate": "delta"
+    },
+    {
+      "fid": 6,
+      "name": "heroes",
+      "type": "map",
+      "partition": "hero",
+      "persist": "blob",
+      "replicate": "delta"
+    },
+    {
+      "fid": 7,
+      "name": "bag",
+      "type": "map",
+      "partition": "item",
+      "persist": "blob",
+      "replicate": "delta"
+    },
+    {
+      "fid": 8,
+      "name": "missions",
+      "type": "map",
+      "partition": "mission",
+      "persist": "lazy",
+      "replicate": "on_demand"
+    },
+    {
+      "fid": 9,
+      "name": "activity",
+      "type": "map",
+      "partition": "activity",
+      "persist": "lazy",
+      "replicate": "on_demand"
+    },
+    {
+      "fid": 10,
+      "name": "last_login",
+      "type": "int",
+      "partition": "base",
+      "persist": "blob",
+      "replicate": "none"
+    },
+    {
+      "fid": 11,
+      "name": "zhanli",
+      "type": "int",
+      "partition": "base",
+      "persist": "derived",
+      "replicate": "delta"
+    },
+    {
+      "fid": 12,
+      "name": "client_flags",
+      "type": "map",
+      "partition": "base",
+      "persist": "transient",
+      "replicate": "none"
+    },
+    {
+      "fid": 13,
+      "name": "silver",
+      "type": "int",
+      "partition": "base",
+      "persist": "index",
+      "replicate": "delta"
+    }
+  ],
+  "actions": [
+    {
+      "aid": 1,
+      "op": "u.login",
+      "params": [
+        "account",
+        "password",
+        "token"
+      ],
+      "handler": "login"
+    },
+    {
+      "aid": 2,
+      "op": "u.create",
+      "params": [
+        "account",
+        "password"
+      ],
+      "handler": "login"
+    },
+    {
+      "aid": 3,
+      "op": "u.dev.heroLv",
+      "params": [
+        "heroId",
+        "lv",
+        "tpl",
+        "advance",
+        "limit"
+      ],
+      "handler": "dev"
+    },
+    {
+      "aid": 4,
+      "op": "u.dev.itemAdd",
+      "params": [
+        "itemId",
+        "count"
+      ],
+      "handler": "dev"
+    },
+    {
+      "aid": 5,
+      "op": "u.avatar_info",
+      "params": [],
+      "handler": "view"
+    },
+    {
+      "aid": 6,
+      "op": "u.snapshot",
+      "params": [
+        "partitions"
+      ],
+      "handler": "wire"
+    },
+    {
+      "aid": 7,
+      "op": "u.delta",
+      "params": [
+        "base_rev"
+      ],
+      "handler": "wire"
+    },
+    {
+      "aid": 8,
+      "op": "u.subscribe",
+      "params": [
+        "partitions"
+      ],
+      "handler": "wire"
+    },
+    {
+      "aid": 9,
+      "op": "u.unsubscribe",
+      "params": [
+        "partitions"
+      ],
+      "handler": "wire"
+    },
+    {
+      "aid": 10,
+      "op": "u.heroUpdateLvAuto",
+      "params": [
+        "heroId",
+        "auto"
+      ],
+      "handler": "hero"
+    },
+    {
+      "aid": 11,
+      "op": "u.heroUpdateAdvanceLv",
+      "params": [
+        "heroId"
+      ],
+      "handler": "hero"
+    },
+    {
+      "aid": 12,
+      "op": "u.heroUpdateLimitLv",
+      "params": [
+        "heroId"
+      ],
+      "handler": "hero"
+    },
+    {
+      "aid": 13,
+      "op": "u.useItem",
+      "params": [
+        "itemId",
+        "useCount",
+        "index"
+      ],
+      "handler": "item"
+    },
+    {
+      "aid": 14,
+      "op": "u.itemSale",
+      "params": [
+        "itemId",
+        "count"
+      ],
+      "handler": "item"
+    },
+    {
+      "aid": 15,
+      "op": "u.missionClaimReward",
+      "params": [
+        "missionId"
+      ],
+      "handler": "mission"
+    },
+    {
+      "aid": 16,
+      "op": "u.crossSubmit",
+      "params": [
+        "rankKey",
+        "score"
+      ],
+      "handler": "cross"
+    },
+    {
+      "aid": 17,
+      "op": "u.crossRank",
+      "params": [
+        "rankKey",
+        "page"
+      ],
+      "handler": "cross"
+    },
+    {
+      "aid": 18,
+      "op": "u.stageChallenge",
+      "params": [
+        "stageId"
+      ],
+      "handler": "stage"
+    },
+    {
+      "aid": 19,
+      "op": "u.stageSweep",
+      "params": [
+        "stageId",
+        "times"
+      ],
+      "handler": "stage"
+    },
+    {
+      "aid": 20,
+      "op": "u.stageInfo",
+      "params": [],
+      "handler": "stage"
+    },
+    {
+      "aid": 21,
+      "op": "u.fightStart",
+      "params": [
+        "stageId"
+      ],
+      "handler": "fight"
+    },
+    {
+      "aid": 22,
+      "op": "u.fightSettle",
+      "params": [
+        "stageId"
+      ],
+      "handler": "fight"
+    },
+    {
+      "aid": 23,
+      "op": "u.shopList",
+      "params": [],
+      "handler": "shop"
+    },
+    {
+      "aid": 24,
+      "op": "u.shopBuy",
+      "params": [
+        "goodsId",
+        "count"
+      ],
+      "handler": "shop"
+    },
+    {
+      "aid": 25,
+      "op": "u.rewardSign",
+      "params": [
+        "day"
+      ],
+      "handler": "reward"
+    },
+    {
+      "aid": 26,
+      "op": "u.rewardOnline",
+      "params": [
+        "minutes"
+      ],
+      "handler": "reward"
+    },
+    {
+      "aid": 27,
+      "op": "u.rankList",
+      "params": [],
+      "handler": "rank"
+    },
+    {
+      "aid": 28,
+      "op": "u.gachaDraw",
+      "params": [],
+      "handler": "gacha"
+    },
+    {
+      "aid": 29,
+      "op": "u.homeInfo",
+      "params": [],
+      "handler": "home"
+    },
+    {
+      "aid": 30,
+      "op": "u.homeUpgrade",
+      "params": [],
+      "handler": "home"
+    },
+    {
+      "aid": 31,
+      "op": "u.errandList",
+      "params": [],
+      "handler": "errand"
+    },
+    {
+      "aid": 32,
+      "op": "u.errandClaim",
+      "params": [
+        "errandId"
+      ],
+      "handler": "errand"
+    }
+  ],
+  "errors": {
+    "OK": 200,
+    "BAD_ACCOUNT": -2,
+    "BAD_PASSWORD": -3,
+    "EXISTS": -4,
+    "BANNED": -19,
+    "UNKNOWN_OP": -100,
+    "BAD_STATE": -101
+  }
+}

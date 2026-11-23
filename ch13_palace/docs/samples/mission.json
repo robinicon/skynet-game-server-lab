@@ -1,0 +1,86 @@
+{
+  "batch": "mission",
+  "source": [
+    "palace-game/src/main/java/com/paofu/palace/gas/proxy/MissionProxy.java:37 claimMissionReward",
+    "palace-game/src/main/java/com/paofu/palace/gas/service/user/MissionService.java:82 claimMissionReward"
+  ],
+  "notes": [
+    "mission 表：5001 → 金锭x1，5002 → 银锭x2，5003 → 中还丹x3",
+    "判定顺序：记录不存在 → 已领取 → 未完成 → 发奖并置 claimed",
+    "任务进度由玩法写入 missions[missionId]={progress,completed,claimed}"
+  ],
+  "cases": [
+    {
+      "name": "claim_gold_reward",
+      "derivation": "5001 奖励金锭 1000 x1 → gold +1000，记录置 claimed",
+      "seed": { "missions": { "5001": { "progress": 3, "completed": true } } },
+      "op": "u.missionClaimReward",
+      "params": [5001],
+      "expect": {
+        "err": 200,
+        "result": { "ok": true, "gain": 1000, "field": "gold" },
+        "state": { "gold": 1000, "missions.5001.claimed": true }
+      }
+    },
+    {
+      "name": "claim_silver_reward",
+      "derivation": "5002 奖励银锭 500 x2 → silver +1000",
+      "seed": { "missions": { "5002": { "progress": 5, "completed": true } } },
+      "op": "u.missionClaimReward",
+      "params": [5002],
+      "expect": {
+        "err": 200,
+        "result": { "ok": true, "gain": 1000, "field": "silver" },
+        "state": { "silver": 1000 }
+      }
+    },
+    {
+      "name": "claim_item_reward",
+      "derivation": "5003 奖励中还丹 x3 → bag[1002]=3",
+      "seed": { "missions": { "5003": { "progress": 1, "completed": true } } },
+      "op": "u.missionClaimReward",
+      "params": [5003],
+      "expect": {
+        "err": 200,
+        "result": { "ok": true, "field": "bag", "gain": 3 },
+        "state": { "bag.1002": 3 }
+      }
+    },
+    {
+      "name": "claim_twice",
+      "derivation": "claimed=true 时原实现 notify MISSION_AWARD_CLAIMED 并返回 false",
+      "seed": { "missions": { "5001": { "progress": 3, "completed": true, "claimed": true } } },
+      "op": "u.missionClaimReward",
+      "params": [5001],
+      "expect": {
+        "err": -200,
+        "result": { "ok": false, "reason": "already_claimed" },
+        "state": { "gold": 0 }
+      }
+    },
+    {
+      "name": "claim_not_completed",
+      "derivation": "completed=false 时原实现 notify MISSION_UN_COMPLETED 并返回 false",
+      "seed": { "missions": { "5001": { "progress": 1, "completed": false } } },
+      "op": "u.missionClaimReward",
+      "params": [5001],
+      "expect": {
+        "err": -200,
+        "result": { "ok": false, "reason": "not_completed" },
+        "state": { "gold": 0 }
+      }
+    },
+    {
+      "name": "claim_missing_mission",
+      "derivation": "entity.getMission(id) 返回 null 时原实现直接返回 {false,null,null}",
+      "seed": {},
+      "op": "u.missionClaimReward",
+      "params": [5001],
+      "expect": {
+        "err": -200,
+        "result": { "ok": false, "reason": "mission_not_found" },
+        "state": { "gold": 0, "silver": null }
+      }
+    }
+  ]
+}

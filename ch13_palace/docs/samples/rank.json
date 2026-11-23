@@ -1,0 +1,43 @@
+{
+  "batch": "rank",
+  "source": "authored demo content (U6_M3_DEVLOG §2.1)",
+  "notes": "本服战力榜复用 hub 的 local.power bucket，走 upsert（无 seq 门）。hub 是进程级全局且跨 case 不重置，因此只断言「自己这一行」：me.score 来自当前实体 zhanli，rows 不做全量比较。",
+  "cases": [
+    {
+      "name": "rank_list_pushes_own_power",
+      "derivation": "zhanli=140 → upsert 后 me 必在榜上，score=140，rank>=1；rankKey 固定 local.power，开关默认开",
+      "seed": { "zhanli": 140, "gold": 0 },
+      "op": "u.rankList",
+      "params": [],
+      "expect": {
+        "err": 200,
+        "result": { "ok": true, "enabled": true, "rankKey": "local.power", "me": { "score": 140 } },
+        "state": { "zhanli": 140 }
+      }
+    },
+    {
+      "name": "rank_list_zero_power_still_listed",
+      "derivation": "zhanli=0 → 不动状态但同样上榜（score=0），me 存在而不是 nil",
+      "seed": { "zhanli": 0, "gold": 0 },
+      "op": "u.rankList",
+      "params": [],
+      "expect": {
+        "err": 200,
+        "result": { "ok": true, "enabled": true, "me": { "score": 0 } },
+        "state": { "zhanli": 0 }
+      }
+    },
+    {
+      "name": "rank_list_readonly_no_state_change",
+      "derivation": "只读动作：不写玩家 state（gold/zhanli 均不变），rev 也不因查榜增长",
+      "seed": { "zhanli": 66, "gold": 12 },
+      "op": "u.rankList",
+      "params": [],
+      "expect": {
+        "err": 200,
+        "result": { "ok": true, "me": { "score": 66 } },
+        "state": { "zhanli": 66, "gold": 12 }
+      }
+    }
+  ]
+}
