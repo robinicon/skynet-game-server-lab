@@ -28,8 +28,16 @@ Makefile.old
 # （若将来改回普通 clone，再取消下一行注释）
 # /skynet/
 
+# ===== 美术资源（纪律：美术一律不入库，只留规范与台账）=====
+art_plan/style_trial/
+art_plan/proof/
+art_plan/out/
+
 # ===== 本地 Agent 数据（非交付内容）=====
 .workbuddy/
+
+# ===== 腾讯文档只读素材副本（改写用临时文件，非交付内容）=====
+.dsh_raw/
 
 # ===== 通用 =====
 .DS_Store
