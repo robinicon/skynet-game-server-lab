@@ -1,0 +1,34 @@
+syntax = "proto2";
+package Msg_DG;
+import "Msg_Common.proto";
+// GameServer↔GameDBServer · 存储双轨：槽位列投影 + Blob(kind)
+
+message RoleSlotRow {
+  // 槽位号 → 值（save 泳道白名单投影，映射 role 表定长列）
+  repeated Msg_Common.PropValue slots = 1;
+}
+
+message RoleBlob {
+  optional uint32 kind = 1;         // blob kind · 只增不改（1=bag 2=skills 3=quests 4=mail ...）
+  optional bytes data = 2;          // protobuf 序列化
+  optional uint32 version = 3;      // blob 内部版本
+}
+
+message RoleLoadReq { optional uint64 uid = 1; optional uint64 role_id = 2; }
+
+message RoleLoadRsp {
+  optional Msg_Common.ErrCode err = 1;
+  optional RoleSlotRow slots = 2;
+  repeated RoleBlob blobs = 3;
+}
+
+message RoleSaveReq {
+  optional uint64 uid = 1;
+  optional uint64 role_id = 2;
+  optional RoleSlotRow slots = 3;   // 仅脏槽位（FIFO 串行队列保证顺序）
+  repeated RoleBlob blobs = 4;      // 仅变更 kind
+}
+message RoleSaveRsp {
+  optional Msg_Common.ErrCode err = 1;
+  optional uint64 role_id = 2;
+}

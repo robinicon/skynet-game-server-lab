@@ -1,0 +1,119 @@
+channels:
+  AUTH: 6
+  CHAT: 5
+  CLI: 1
+  CROSS: 3
+  DB: 2
+  GATE: 4
+opcodes:
+  AUTH_LOGIN_REQ:
+    channel: AUTH
+    id: 1
+    proto: Msg_AUTH.AuthLoginReq
+    value: 393217
+  AUTH_LOGIN_RSP:
+    channel: AUTH
+    id: 2
+    proto: Msg_AUTH.AuthLoginRsp
+    value: 393218
+  AUTH_TICKET_VERIFY_REQ:
+    channel: AUTH
+    id: 3
+    proto: Msg_AUTH.TicketVerifyReq
+    value: 393219
+  AUTH_TICKET_VERIFY_RSP:
+    channel: AUTH
+    id: 4
+    proto: Msg_AUTH.TicketVerifyRsp
+    value: 393220
+  CLI_ATTACK_REQ:
+    channel: CLI
+    id: 10
+    proto: Msg_CG.AttackReq
+    value: 65546
+  CLI_ATTACK_RSP:
+    channel: CLI
+    id: 11
+    proto: Msg_CG.AttackRsp
+    value: 65547
+  CLI_ATTACK_SYNC:
+    channel: CLI
+    id: 12
+    proto: Msg_CG.AttackSync
+    value: 65548
+  CLI_ENTER_GAME_REQ:
+    channel: CLI
+    id: 5
+    proto: Msg_CG.EnterGameReq
+    value: 65541
+  CLI_ENTER_GAME_RSP:
+    channel: CLI
+    id: 6
+    proto: Msg_CG.EnterGameRsp
+    value: 65542
+  CLI_HEARTBEAT:
+    channel: CLI
+    id: 1
+    proto: Msg_CG.Heartbeat
+    value: 65537
+  CLI_HEARTBEAT_ACK:
+    channel: CLI
+    id: 2
+    proto: Msg_CG.HeartbeatAck
+    value: 65538
+  CLI_MOVE_REQ:
+    channel: CLI
+    id: 8
+    proto: Msg_CG.MoveReq
+    value: 65544
+  CLI_MOVE_SYNC:
+    channel: CLI
+    id: 9
+    proto: Msg_CG.MoveSync
+    value: 65545
+  CLI_SELECT_SERVER_REQ:
+    channel: CLI
+    id: 3
+    proto: Msg_CL.SelectServerReq
+    value: 65539
+  CLI_SELECT_SERVER_RSP:
+    channel: CLI
+    id: 4
+    proto: Msg_CL.SelectServerRsp
+    value: 65540
+  CLI_SYNC_PROPS:
+    channel: CLI
+    id: 7
+    proto: Msg_CG.SyncProps
+    value: 65543
+  CLI_VERSION_CHECK_REQ:
+    channel: CLI
+    id: 13
+    proto: Msg_CG.VersionCheckReq
+    value: 65549
+  CLI_VERSION_CHECK_RSP:
+    channel: CLI
+    id: 14
+    proto: Msg_CG.VersionCheckRsp
+    value: 65550
+  DB_ROLE_LOAD_REQ:
+    channel: DB
+    id: 1
+    proto: Msg_DG.RoleLoadReq
+    value: 131073
+  DB_ROLE_LOAD_RSP:
+    channel: DB
+    id: 2
+    proto: Msg_DG.RoleLoadRsp
+    value: 131074
+  DB_ROLE_SAVE_REQ:
+    channel: DB
+    id: 3
+    proto: Msg_DG.RoleSaveReq
+    value: 131075
+  DB_ROLE_SAVE_RSP:
+    channel: DB
+    id: 4
+    proto: Msg_DG.RoleSaveRsp
+    value: 131076
+version: 3

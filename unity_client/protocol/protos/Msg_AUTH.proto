@@ -1,0 +1,41 @@
+syntax = "proto2";
+package Msg_AUTH;
+import "Msg_Common.proto";
+// 客户端↔认证服 · Ticket 体系
+// Ticket = base64({uid, channel, expire, nonce, sign})
+// sign = HMAC-SHA256(uid|channel|expire|nonce, secret)  60s 时效 · 一次性
+
+message AuthLoginReq {
+  optional string channel = 1;        // guest/wx/taptap/apple/qq...
+  optional string channel_token = 2;  // 渠道 SDK 返回的凭证（游客为设备id）
+  optional string device_id = 3;
+  optional uint64 timestamp = 4;
+}
+
+message ServerInfo {
+  optional uint32 server_id = 1;
+  optional string name = 2;
+  optional uint32 state = 3;          // 0流畅 1繁忙 2维护 3新服
+  optional string gate_host = 4;
+  optional uint32 gate_port = 5;
+}
+
+message AuthLoginRsp {
+  optional Msg_Common.ErrCode err = 1;
+  optional string ticket = 2;         // 一次性 · 60s · nonce 防重放
+  optional uint64 uid = 3;
+  repeated ServerInfo servers = 4;    // 选服列表（认证服返回，Gate 由 Login 流程给出）
+}
+
+// Gate/Login → AuthServer 内网验票
+message TicketVerifyReq {
+  optional string ticket = 1;
+  optional uint64 uid = 2;
+  optional string client_ip = 3;
+}
+
+message TicketVerifyRsp {
+  optional Msg_Common.ErrCode err = 1;
+  optional uint64 uid = 2;
+  optional string channel = 3;
+}

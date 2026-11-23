@@ -1,0 +1,33 @@
+# opcode 注册表 · 唯一来源 · 只增不改
+# 修改规则见 docs/规范/工程纪律与开发规范.md §1
+version: 3
+channels:
+  CLI: 0x0001
+  DB: 0x0002
+  CROSS: 0x0003
+  GATE: 0x0004
+  CHAT: 0x0005
+  AUTH: 0x0006
+opcodes:
+  - {name: AUTH_LOGIN_REQ, channel: AUTH, id: 0x0001, proto: Msg_AUTH.AuthLoginReq, note: 渠道凭证换Ticket}
+  - {name: AUTH_LOGIN_RSP, channel: AUTH, id: 0x0002, proto: Msg_AUTH.AuthLoginRsp, note: Ticket+服务器列表}
+  - {name: AUTH_TICKET_VERIFY_REQ, channel: AUTH, id: 0x0003, proto: Msg_AUTH.TicketVerifyReq, note: Gate/Login内网验票}
+  - {name: AUTH_TICKET_VERIFY_RSP, channel: AUTH, id: 0x0004, proto: Msg_AUTH.TicketVerifyRsp}
+  - {name: CLI_HEARTBEAT, channel: CLI, id: 0x0001, proto: Msg_CG.Heartbeat, note: 心跳}
+  - {name: CLI_HEARTBEAT_ACK, channel: CLI, id: 0x0002, proto: Msg_CG.HeartbeatAck}
+  - {name: CLI_VERSION_CHECK_REQ, channel: CLI, id: 0x000D, proto: Msg_CG.VersionCheckReq, note: "[v3] 客户端版本门禁 · 接入时第一帧"}
+  - {name: CLI_VERSION_CHECK_RSP, channel: CLI, id: 0x000E, proto: Msg_CG.VersionCheckRsp, note: "[v3] 版本判定结果 + 强更策略"}
+  - {name: CLI_SELECT_SERVER_REQ, channel: CLI, id: 0x0003, proto: Msg_CL.SelectServerReq, note: 携Ticket选服}
+  - {name: CLI_SELECT_SERVER_RSP, channel: CLI, id: 0x0004, proto: Msg_CL.SelectServerRsp, note: 返回网关地址}
+  - {name: CLI_ENTER_GAME_REQ, channel: CLI, id: 0x0005, proto: Msg_CG.EnterGameReq}
+  - {name: CLI_ENTER_GAME_RSP, channel: CLI, id: 0x0006, proto: Msg_CG.EnterGameRsp}
+  - {name: CLI_SYNC_PROPS, channel: CLI, id: 0x0007, proto: Msg_CG.SyncProps, note: 通用属性同步·泳道白名单投影}
+  - {name: CLI_MOVE_REQ, channel: CLI, id: 0x0008, proto: Msg_CG.MoveReq}
+  - {name: CLI_MOVE_SYNC, channel: CLI, id: 0x0009, proto: Msg_CG.MoveSync}
+  - {name: CLI_ATTACK_REQ, channel: CLI, id: 0x000A, proto: Msg_CG.AttackReq, note: 攻击请求（S3 战斗）}
+  - {name: CLI_ATTACK_RSP, channel: CLI, id: 0x000B, proto: Msg_CG.AttackRsp}
+  - {name: CLI_ATTACK_SYNC, channel: CLI, id: 0x000C, proto: Msg_CG.AttackSync, note: 战斗事件场景广播}
+  - {name: DB_ROLE_LOAD_REQ, channel: DB, id: 0x0001, proto: Msg_DG.RoleLoadReq}
+  - {name: DB_ROLE_LOAD_RSP, channel: DB, id: 0x0002, proto: Msg_DG.RoleLoadRsp}
+  - {name: DB_ROLE_SAVE_REQ, channel: DB, id: 0x0003, proto: Msg_DG.RoleSaveReq, note: 槽位列+Blob(kind)}
+  - {name: DB_ROLE_SAVE_RSP, channel: DB, id: 0x0004, proto: Msg_DG.RoleSaveRsp}
