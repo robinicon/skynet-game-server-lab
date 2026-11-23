@@ -1,0 +1,23 @@
+#!/bin/sh
+# ============================================================
+# 仓库纪律：md 文档一律不入库
+# 规则见 .gitignore 的「文档一律不入库」段与本钩子。
+# 任何 .md / .MD 文件进入暂存区即拦截提交，本地文件不受影响。
+# 启用：git config core.hooksPath .githooks
+# ============================================================
+
+staged_md=$(git diff --cached --name-only --diff-filter=ACMR -z \
+  | tr '\0' '\n' \
+  | grep -iE '\.md$' || true)
+
+if [ -n "$staged_md" ]; then
+  echo ""
+  echo "[纪律拦截] 以下 md 文件不得提交（美术/文档仅留本地）：" >&2
+  echo "$staged_md" | sed 's/^/    /' >&2
+  echo "" >&2
+  echo "处理：git restore --staged <文件> 取消暂存，文件本身会保留在本地。" >&2
+  echo "" >&2
+  exit 1
+fi
+
+exit 0
