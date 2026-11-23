@@ -12,7 +12,7 @@
 | 02 | `docs/blog/02-ch5-perf-对象池收益边界.md` | `ch5_perf/` | `7fc9886` | — | 待回填 | 2026-11-20（提交日） | 59 PASS |
 | 03 | `docs/blog/03-ch6-ecs-双语言ECS设计.md` | `ch6_ecs/` | `2fa9fac` | — | 待回填 | 2026-11-21（提交日） | 41 PASS |
 | 04 | `docs/blog/04-ch7-db-并发存盘安全.md` | `ch7_db/` | `872580d` | — | 待回填 | 2026-11-22（提交日） | 37 PASS |
-| 05 | `docs/blog/05-ch8-components-组件式Agent.md` | `ch8_components/` | `5f86eb6`（代码） | — | — | 计划 2026-11-24 | 30 PASS（2026-11-22 复跑） |
+| 05 | `docs/blog/05-ch8-components-组件式Agent.md` | `ch8_components/` | `5f86eb6`（代码，不含 md） | — | — | 计划 2026-11-24 | 30 PASS（2026-11-23 复跑） |
 | 06 | `docs/blog/06-ch9-http-管理接口设计.md` | `ch9_http/` | `e186c4c`（代码） | — | — | 计划 2026-12-01 | 35 PASS（2026-11-22 复跑） |
 | 07 | `docs/blog/07-ch10-分布式登录与跨节点容错.md` | `ch10_distributed/` | `d4e9ec5`（代码） | — | — | 计划 2026-12-08 | 36 PASS（2026-11-22 复跑） |
 | 08 | `docs/blog/08-ch11-分布式跳转.md` | `ch11_jump/` | `f7b220c`（代码） | — | — | 计划 2026-12-15 | 18 PASS（2026-11-22 复跑） |
