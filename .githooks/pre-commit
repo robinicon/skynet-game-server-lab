@@ -1,20 +1,32 @@
 #!/bin/sh
 # ============================================================
-# 仓库纪律：md 文档一律不入库
-# 规则见 .gitignore 的「文档一律不入库」段与本钩子。
-# 任何 .md / .MD 文件进入暂存区即拦截提交，本地文件不受影响。
-# 启用：git config core.hooksPath .githooks
+# 仓库纪律（本地钩子，需 git config core.hooksPath .githooks 启用）
+#   纪律一：md 文档一律不入库
+#   纪律二：back/ 备份目录一律不入库
+# 规则见 .gitignore 对应段落。本钩子拦截 git add -f 强制绕过的情形。
+# 本地文件不受影响，仅阻止进入提交。
 # ============================================================
 
-staged_md=$(git diff --cached --name-only --diff-filter=ACMR -z \
-  | tr '\0' '\n' \
-  | grep -iE '\.md$' || true)
+staged_list=$(git diff --cached --name-only --diff-filter=ACMR -z | tr '\0' '\n')
+
+staged_md=$(printf '%s\n' "$staged_list" | grep -iE '\.md$' || true)
+staged_back=$(printf '%s\n' "$staged_list" | grep -E '^back/' || true)
 
 if [ -n "$staged_md" ]; then
-  echo ""
-  echo "[纪律拦截] 以下 md 文件不得提交（美术/文档仅留本地）：" >&2
+  echo "" >&2
+  echo "[纪律一拦截] 以下 md 文件不得提交（文档仅留本地）：" >&2
   echo "$staged_md" | sed 's/^/    /' >&2
   echo "" >&2
+fi
+
+if [ -n "$staged_back" ]; then
+  echo "" >&2
+  echo "[纪律二拦截] 以下 back/ 备份文件不得提交（回滚快照仅留本地）：" >&2
+  echo "$staged_back" | sed 's/^/    /' >&2
+  echo "" >&2
+fi
+
+if [ -n "$staged_md" ] || [ -n "$staged_back" ]; then
   echo "处理：git restore --staged <文件> 取消暂存，文件本身会保留在本地。" >&2
   echo "" >&2
   exit 1

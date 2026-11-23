@@ -11,6 +11,13 @@
   某个 md，提交也会被拒绝，并列出被拦截的文件路径。
 - 本地文件不受影响，随时可读可改，只是不进入版本库。
 
+规则二：back/ 备份目录一律不入库
+--------------------------------
+- 改动前把规划外的工程文件整体复制到 back/ 作为回滚快照，原文件保留原位。
+- .gitignore 用 /back/ 忽略整个目录；pre-commit 二次拦截强制暂存的备份文件。
+- back/BACKUP_MANIFEST.txt 记录备份时间、清单与恢复方式。
+- back/_meta/gitignore.orig 是改动前的 .gitignore 原文，用于回滚对照。
+
 启用方式（每个 clone 执行一次）
 --------------------------------
     git config core.hooksPath .githooks
