@@ -5,7 +5,7 @@
 
 ## 当前状态
 
-- `make test`：**327 PASS / 0 FAIL**（默认 memory 驱动；10 个测试服务）
+- `make test`：**551 PASS / 0 FAIL**（默认 memory 驱动；14 个测试服务）
 - `make test-mysql`：**35 PASS / 0 FAIL**（MySQL 往返 + 重启持久化）
 - `make reconcile`：**23 cases / 0 failed**；`make reconcile-mysql` 同样 **23 / 0**（换驱动不改语义）
 - 已实现：schema 生成与校验、分区脏写与 rev、7 种统一信封、legacy 协议归一化、test 渠道登录、动作 delta、**TCP 网关**、**双存储驱动（memory / mysql，上层零改动）**、**会话完整化（断线挂起 / token 重连 / 顶号 / 超时落盘）**、**wire 分级协议**、**处理器注册制 + Excel 内容配表 + 回放对账（hero / item / mission 三批 6 个动作）**
@@ -61,7 +61,7 @@ make -C ch13_palace gamedata-preview # 预览游戏内容表（英雄/道具/任
 ```
 gamedata check: hero=4 exp=79 surmount=16 week=16 item=7 mission=3, lua + mirror in sync
 schema check: 13 fields, 15 actions, 7 errors, xlsx in sync with 3 generated files + mirror
-=== TOTAL: 327 PASS, 0 FAIL ===
+=== TOTAL: 551 PASS, 0 FAIL ===
 ```
 
 ## 目录
