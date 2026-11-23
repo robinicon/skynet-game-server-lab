@@ -1,0 +1,49 @@
+{
+  "_comment": "V05 配套：界面 → 协议需求。只记录 prefab 文件名与它需要什么数据，不含任何美术内容（美术资源不开源）。",
+  "_source": "GameBookClient art/Assets/UI/Prefabs 目录清单（仅文件名）",
+  "screens": [
+    {
+      "prefab": "Login",
+      "flow": "登录",
+      "needs": ["CLI_VERSION_CHECK_REQ", "AUTH_LOGIN_REQ", "CLI_SELECT_SERVER_REQ"],
+      "note": "版本门禁 → 渠道换 Ticket → 携 Ticket 选服"
+    },
+    {
+      "prefab": "RoleSelect",
+      "flow": "选角",
+      "needs": ["CLI_ROLE_LIST_REQ"],
+      "note": "取当前账号下的角色列表"
+    },
+    {
+      "prefab": "Character (List)",
+      "flow": "选角",
+      "needs": ["CLI_ROLE_LIST_RSP"],
+      "passive": true,
+      "note": "列表项，被动渲染，不单独发请求"
+    },
+    {
+      "prefab": "RoleCreate",
+      "flow": "创角",
+      "needs": ["CLI_ROLE_CREATE_REQ"],
+      "note": "职业/性别可选值 + 重名校验结果"
+    },
+    {
+      "prefab": "Modal Box 0/1/2",
+      "flow": "提示",
+      "needs": [],
+      "note": "错误码 → 文案，随各响应下发；三档按严重程度"
+    },
+    {
+      "prefab": "Loading Bar",
+      "flow": "过渡",
+      "needs": [],
+      "note": "纯本地进度，不进协议"
+    }
+  ],
+  "proposals": [
+    {"name": "CLI_ROLE_LIST_REQ", "channel": "CLI", "id": "0x000F", "proto": "Msg_CL.RoleListReq", "note": "取当前账号角色列表"},
+    {"name": "CLI_ROLE_LIST_RSP", "channel": "CLI", "id": "0x0010", "proto": "Msg_CL.RoleListRsp"},
+    {"name": "CLI_ROLE_CREATE_REQ", "channel": "CLI", "id": "0x0011", "proto": "Msg_CL.RoleCreateReq", "note": "创角 + 重名校验"},
+    {"name": "CLI_ROLE_CREATE_RSP", "channel": "CLI", "id": "0x0012", "proto": "Msg_CL.RoleCreateRsp"}
+  ]
+}
