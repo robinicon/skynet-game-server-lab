@@ -1,4 +1,0 @@
-data/*.json
-log/
-__pycache__/
-clib/*.so
